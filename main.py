@@ -42,6 +42,9 @@ class ImageWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    file_path = sys.argv[1]
+
     window = ImageWindow()
     window.show()
     sys.exit(app.exec())
