@@ -4,7 +4,7 @@ from PyQt6.QtGui import QPixmap, QAction
 from PyQt6.QtCore import Qt
 
 class ImageWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, file_path=None):
         super().__init__()
         self.setWindowTitle("Image Viewer")
 
@@ -16,6 +16,9 @@ class ImageWindow(QMainWindow):
         self.layout.addWidget(self.label)
 
         self.create_menu()
+
+        if file_path:
+            self.display_image(file_path)
 
     def create_menu(self):
         menu_bar = self.menuBar()
@@ -43,9 +46,9 @@ class ImageWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    file_path = sys.argv[1]
+    file_path = sys.argv[1] if len(sys.argv) > 1 else None
 
-    window = ImageWindow()
+    window = ImageWindow(file_path)
     window.show()
     sys.exit(app.exec())
 
