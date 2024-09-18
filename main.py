@@ -1,37 +1,48 @@
 import sys
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLineEdit, QPushButton, QMessageBox, QHBoxLayout, QMainWindow, QMenuBar, QTextBrowser, QDialog, QGridLayout, QLabel, QScrollArea, QProgressBar, QGraphicsOpacityEffect
-from PyQt6.QtGui import QAction, QImage, QPixmap
-from PyQt6.QtCore import QPropertyAnimation, Qt
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QMainWindow, QFileDialog
+from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtCore import Qt
 
-class ImageWindow(QWidget):
+class ImageWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Image Viewer")
 
-        #self.setMaximumWidth(500)
-        #self.setMaximumHeight(500) #in dev
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
 
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout(self.central_widget)
         self.label = QLabel()
-        pixmap = QPixmap(path)
+        self.layout.addWidget(self.label)
+
+        self.create_menu()
+
+    def create_menu(self):
+        menu_bar = self.menuBar()
+        file_menu = menu_bar.addMenu("File")
+
+        open_action = QAction("Open", self)
+        open_action.triggered.connect(self.open_file)
+        file_menu.addAction(open_action)
+
+    def open_file(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Images (*.png *.xpm *.jpg *.jpeg *.bmp *.gif)")
+        if file_path:
+            self.display_image(file_path)
+
+    def display_image(self, file_path):
+        pixmap = QPixmap(file_path)
+        screen_rect = QApplication.primaryScreen().availableGeometry()
+        max_width = int(screen_rect.width() * 0.8)
+        max_height = int(screen_rect.height() * 0.8)
+
+        # Scale the pixmap to fit within the maximum dimensions
+        pixmap = pixmap.scaled(max_width, max_height, Qt.AspectRatioMode.KeepAspectRatio)
         self.label.setPixmap(pixmap)
-        self.label.setScaledContents(True)
-
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-
-        
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("ERROR: No path provided")
-        sys.exit(1)
-
     app = QApplication(sys.argv)
-    path = sys.argv[1]
-
-    print(f"Path to image is {path}")
-
     window = ImageWindow()
     window.show()
     sys.exit(app.exec())
+
